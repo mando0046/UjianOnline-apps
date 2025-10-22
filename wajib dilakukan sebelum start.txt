@@ -1,0 +1,4 @@
+wajib dilakukan sebelum start
+
+npm install
+npm run dev
