@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
             ],
             [
-                'name' => 'Agus',
+                'name' => 'Agus Gondrong',
                 'email' => 'agus@gmail.com',
                 'password' => 'password',
                 'role' => 'peserta',
@@ -64,7 +64,25 @@ class UserSeeder extends Seeder
                 'email' => 'budi@gmail.com',
                 'password' => 'password',
                 'role' => 'guest',
-            ],      
+            ],    
+             [
+                'name' => 'Eko Waluyo',
+                'email' => 'waluyo@gmail.com',
+                'password' => 'password',
+                'role' => 'guest',
+            ],  
+              [
+                'name' => 'Dedy Iswadi',
+                'email' => 'dedy@gmail.com',
+                'password' => 'password',
+                'role' => 'guest',
+            ],   
+              [
+                'name' => 'Nia Ramadani',
+                'email' => 'nia@gmail.com',
+                'password' => 'password',
+                'role' => 'guest',
+            ], 
         ];
 
         foreach ($users as $data) {

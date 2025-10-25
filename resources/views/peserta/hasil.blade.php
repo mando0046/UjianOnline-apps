@@ -41,29 +41,37 @@
 
                 <!-- Progress bar -->
                 <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
-                    <div class="h-6 rounded-full transition-all duration-700
-                        @if (($score ?? 0) >= 80) bg-green-500 
-                        @elseif(($score ?? 0) >= 60) bg-yellow-400 
+                    <div id="progress-bar"
+                        class="h-6 rounded-full transition-all duration-1000 ease-out
+                        @if (($score ?? 0) >= 81) bg-green-500
+                        @elseif(($score ?? 0) >= 75) bg-lime-400
+                        @elseif(($score ?? 0) >= 61) bg-yellow-400
                         @else bg-red-500 @endif"
-                        style="width: {{ $score ?? 0 }}%;">
+                        style="width: 0%;">
                     </div>
                 </div>
 
+                <!-- Nilai angka -->
                 <p
                     class="text-4xl font-extrabold mt-4
-                    @if (($score ?? 0) >= 80) text-green-600
-                    @elseif(($score ?? 0) >= 60) text-yellow-500
+                    @if (($score ?? 0) >= 81) text-green-600
+                    @elseif(($score ?? 0) >= 75) text-lime-600
+                    @elseif(($score ?? 0) >= 61) text-yellow-600
                     @else text-red-600 @endif">
                     {{ $score ?? 0 }} / 100
                 </p>
 
-                <p class="mt-2 text-gray-600 italic">
-                    @if (($score ?? 0) >= 80)
-                        🎉 Hebat! Kamu lulus dengan nilai tinggi!
-                    @elseif(($score ?? 0) >= 60)
-                        👍 Lumayan, tapi masih bisa lebih baik!
+                <!-- Pesan motivasi -->
+                <p class="mt-3 text-gray-700 italic text-lg">
+                    @if (($score ?? 0) >= 81)
+                        🎉 Hebat! Nilaimu <strong>Sangat Bagus!</strong>
+                    @elseif(($score ?? 0) >= 75)
+                        🎉 Nilaimu sudah <strong>Bagus</strong>, tingkatkan lagi ya!
+                    @elseif(($score ?? 0) >= 61)
+                        🎉 Nilaimu <strong>Cukup</strong> namun harus ditingkatkan lagi!
                     @else
-                        💪 Jangan menyerah! Coba lagi ya!
+                        🎉 Nilaimu <strong>Kurang</strong>. Ayo semangat 💪! Jangan menyerah, belajar dan belajar lagi —
+                        pasti bisa!
                     @endif
                 </p>
             </div>
@@ -81,4 +89,50 @@
             </div>
         </div>
     </div>
+
+    <!-- Script animasi dan confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const score = {{ $score ?? 0 }};
+            const progress = document.getElementById('progress-bar');
+            const finalWidth = Math.min(score, 100) + '%';
+
+            // Animasi bar nilai
+            setTimeout(() => {
+                progress.style.width = finalWidth;
+            }, 300);
+
+            // 🎉 Confetti untuk nilai >= 81
+            if (score >= 81) {
+                const duration = 2500;
+                const animationEnd = Date.now() + duration;
+                const defaults = {
+                    startVelocity: 25,
+                    spread: 360,
+                    ticks: 60,
+                    zIndex: 9999
+                };
+
+                function randomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+
+                const interval = setInterval(() => {
+                    const timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+
+                    const particleCount = 50 * (timeLeft / duration);
+                    confetti({
+                        ...defaults,
+                        particleCount,
+                        origin: {
+                            x: randomInRange(0.1, 0.9),
+                            y: Math.random() - 0.2
+                        }
+                    });
+                }, 200);
+            }
+        });
+    </script>
 </x-app-layout>

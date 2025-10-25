@@ -1,128 +1,149 @@
 <x-app-layout>
     <x-slot name="header">
-        Edit Soal
+        <h2 class="text-xl font-semibold">
+            ✏️ Edit Soal
+        </h2>
     </x-slot>
 
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <form action="{{ route('admin.soal.update', $soal->id) }}" method="POST" enctype="multipart/form-data">
+    <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md space-y-6">
+        <form action="{{ route('admin.soal.update', $soal->id) }}" method="POST" enctype="multipart/form-data"
+            class="space-y-6">
             @csrf
             @method('PUT')
 
-            {{-- ================= PERTANYAAN ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Pertanyaan</label>
-                <textarea name="question" rows="3" class="w-full border-gray-300 rounded-md">{{ old('question', $soal->question) }}</textarea>
+            <!-- 📝 Pertanyaan -->
+            <div>
+                <label for="question" class="block font-semibold mb-1">Pertanyaan</label>
+                <textarea name="question" id="question" rows="4" class="w-full border p-2 rounded focus:ring focus:ring-blue-300"
+                    required>{{ old('question', $soal->question) }}</textarea>
+            </div>
 
-                {{-- Gambar Pertanyaan --}}
-                <label class="block text-gray-700 font-medium mt-2">Gambar Pertanyaan (opsional)</label>
-                <input type="file" name="question_image" accept="image/*" class="w-full border-gray-300 rounded-md">
+            <!-- 🖼️ Gambar Pertanyaan -->
+            <div>
+                <label for="image" class="block font-semibold mb-1">Gambar Pertanyaan (JPEG/JPG)</label>
+                <input type="file" name="image" id="image" accept=".jpeg,.jpg"
+                    class="w-full border p-2 rounded" onchange="previewImage(event, 'preview-image')">
 
-                @if ($soal->question_image)
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-500">Gambar saat ini:</p>
-                        <img src="{{ asset('storage/' . $soal->question_image) }}" alt="Gambar Pertanyaan"
-                            class="w-40 rounded border">
+                <!-- Preview gambar baru -->
+                <img id="preview-image" class="hidden h-32 mt-2 rounded border shadow-sm" alt="Preview Gambar Baru">
+
+                <!-- ✅ Gambar lama -->
+                @if ($soal->question_image && file_exists(public_path('storage/' . $soal->question_image)))
+                    <div class="mt-3">
+                        <p class="text-sm text-gray-600">🖼️ Gambar pertanyaan saat ini:</p>
+                        <img src="{{ asset('storage/' . $soal->question_image) }}" alt="Gambar Soal Lama"
+                            class="h-32 rounded border shadow-md mt-1">
+
+                        <!-- Checkbox hapus gambar lama -->
+                        <div class="mt-2">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="delete_old_image" value="1" class="mr-2">
+                                <span class="text-sm text-gray-700">Hapus gambar lama ini</span>
+                            </label>
+                        </div>
                     </div>
                 @endif
             </div>
 
-            {{-- ================= PILIHAN A ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Pilihan A</label>
-                <input type="text" name="option_a" class="w-full border-gray-300 rounded-md"
-                    value="{{ old('option_a', $soal->option_a) }}">
-                <label class="block text-gray-700 font-medium mt-2">Gambar Pilihan A (opsional)</label>
-                <input type="file" name="option_a_image" accept="image/*" class="w-full border-gray-300 rounded-md">
-                @if ($soal->option_a_image)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $soal->option_a_image) }}" alt="Gambar A"
-                            class="w-32 rounded border">
+            <!-- 🧩 Pilihan Jawaban -->
+            <div>
+                <label class="block font-semibold mb-2">Jawaban Pilihan</label>
+
+                @foreach (['a', 'b', 'c', 'd', 'e'] as $opt)
+                    @php $imgField = "option_image_$opt"; @endphp
+                    <div class="mb-5 border rounded-lg p-4 bg-gray-50">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <!-- Teks Jawaban -->
+                            <div>
+                                <label class="block font-semibold mb-1">Teks Jawaban {{ strtoupper($opt) }}</label>
+                                <input type="text" name="option_{{ $opt }}"
+                                    class="w-full border p-2 rounded focus:ring focus:ring-blue-300"
+                                    value="{{ old('option_' . $opt, $soal->{'option_' . $opt}) }}" required>
+                            </div>
+
+                            <!-- Gambar Jawaban -->
+                            <div>
+                                <label class="block font-semibold mb-1">Gambar Jawaban {{ strtoupper($opt) }}
+                                    (JPEG/JPG)
+                                </label>
+                                <input type="file" name="option_image_{{ $opt }}" accept=".jpeg,.jpg"
+                                    class="w-full border p-2 rounded"
+                                    onchange="previewImage(event, 'preview-{{ $opt }}')">
+
+                                <!-- Preview gambar baru -->
+                                <img id="preview-{{ $opt }}" class="hidden h-24 mt-2 rounded border shadow-sm">
+
+                                <!-- Gambar lama -->
+                                @if ($soal->$imgField && file_exists(public_path('storage/' . $soal->$imgField)))
+                                    <div class="mt-2">
+                                        <p class="text-sm text-gray-600">📷 Gambar jawaban {{ strtoupper($opt) }} saat
+                                            ini:</p>
+                                        <img src="{{ asset('storage/' . $soal->$imgField) }}"
+                                            alt="Opsi {{ strtoupper($opt) }}"
+                                            class="h-24 rounded border shadow-md mt-1">
+
+                                        <!-- Checkbox hapus gambar -->
+                                        <div class="mt-2">
+                                            <label class="inline-flex items-center">
+                                                <input type="checkbox"
+                                                    name="delete_old_option_image_{{ $opt }}" value="1"
+                                                    class="mr-2">
+                                                <span class="text-sm text-gray-700">Hapus gambar lama ini</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
-                @endif
+                @endforeach
             </div>
 
-            {{-- ================= PILIHAN B ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Pilihan B</label>
-                <input type="text" name="option_b" class="w-full border-gray-300 rounded-md"
-                    value="{{ old('option_b', $soal->option_b) }}">
-                <label class="block text-gray-700 font-medium mt-2">Gambar Pilihan B (opsional)</label>
-                <input type="file" name="option_b_image" accept="image/*" class="w-full border-gray-300 rounded-md">
-                @if ($soal->option_b_image)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $soal->option_b_image) }}" alt="Gambar B"
-                            class="w-32 rounded border">
-                    </div>
-                @endif
-            </div>
-
-            {{-- ================= PILIHAN C ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Pilihan C</label>
-                <input type="text" name="option_c" class="w-full border-gray-300 rounded-md"
-                    value="{{ old('option_c', $soal->option_c) }}">
-                <label class="block text-gray-700 font-medium mt-2">Gambar Pilihan C (opsional)</label>
-                <input type="file" name="option_c_image" accept="image/*" class="w-full border-gray-300 rounded-md">
-                @if ($soal->option_c_image)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $soal->option_c_image) }}" alt="Gambar C"
-                            class="w-32 rounded border">
-                    </div>
-                @endif
-            </div>
-
-            {{-- ================= PILIHAN D ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Pilihan D</label>
-                <input type="text" name="option_d" class="w-full border-gray-300 rounded-md"
-                    value="{{ old('option_d', $soal->option_d) }}">
-                <label class="block text-gray-700 font-medium mt-2">Gambar Pilihan D (opsional)</label>
-                <input type="file" name="option_d_image" accept="image/*" class="w-full border-gray-300 rounded-md">
-                @if ($soal->option_d_image)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $soal->option_d_image) }}" alt="Gambar D"
-                            class="w-32 rounded border">
-                    </div>
-                @endif
-            </div>
-
-            {{-- ================= PILIHAN E ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Pilihan E</label>
-                <input type="text" name="option_e" class="w-full border-gray-300 rounded-md"
-                    value="{{ old('option_e', $soal->option_e) }}">
-                <label class="block text-gray-700 font-medium mt-2">Gambar Pilihan E (opsional)</label>
-                <input type="file" name="option_e_image" accept="image/*" class="w-full border-gray-300 rounded-md">
-                @if ($soal->option_e_image)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $soal->option_e_image) }}" alt="Gambar E"
-                            class="w-32 rounded border">
-                    </div>
-                @endif
-            </div>
-
-            {{-- ================= JAWABAN BENAR ================= --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium">Jawaban Benar</label>
-                <select name="answer" class="w-full border-gray-300 rounded-md">
-                    <option value="A" {{ old('answer', $soal->answer) == 'A' ? 'selected' : '' }}>A</option>
-                    <option value="B" {{ old('answer', $soal->answer) == 'B' ? 'selected' : '' }}>B</option>
-                    <option value="C" {{ old('answer', $soal->answer) == 'C' ? 'selected' : '' }}>C</option>
-                    <option value="D" {{ old('answer', $soal->answer) == 'D' ? 'selected' : '' }}>D</option>
-                    <option value="E" {{ old('answer', $soal->answer) == 'E' ? 'selected' : '' }}>E</option>
+            <!-- 🔑 Kunci Jawaban -->
+            <div>
+                <label for="answer" class="block font-semibold mb-1">Kunci Jawaban</label>
+                <select name="answer" id="answer" class="w-full border p-2 rounded focus:ring focus:ring-blue-300"
+                    required>
+                    <option value="">-- Pilih Jawaban Benar --</option>
+                    @foreach (['a', 'b', 'c', 'd', 'e'] as $opt)
+                        <option value="{{ $opt }}"
+                            {{ old('answer', $soal->answer) == $opt ? 'selected' : '' }}>
+                            {{ strtoupper($opt) }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
-            {{-- ================= TOMBOL ================= --}}
-            <div class="flex justify-between mt-6">
+            <!-- Tombol -->
+            <div class="flex justify-end items-center gap-3 pt-4 border-t">
                 <a href="{{ route('admin.soal.index') }}"
-                    class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                    Kembali
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                    ← Kembali
                 </a>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                    Simpan Perubahan
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                    💾 Simpan Perubahan
                 </button>
             </div>
         </form>
     </div>
+
+    <!-- 🔹 Preview Gambar Baru -->
+    <script>
+        function previewImage(event, previewId) {
+            const input = event.target;
+            const preview = document.getElementById(previewId);
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.classList.add('hidden');
+                preview.src = '';
+            }
+        }
+    </script>
 </x-app-layout>

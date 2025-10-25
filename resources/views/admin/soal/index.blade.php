@@ -5,14 +5,26 @@
 
     <!-- ✅ Pesan sukses / error -->
     @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-            ✅ {{ session('success') }}
+        <div class="max-w-6xl mx-auto mt-4">
+            <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-lg shadow-sm relative"
+                role="alert">
+                <strong class="font-bold">✅ Berhasil!</strong>
+                <span class="block sm:inline">{{ session('success') }}</span>
+                <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 text-green-700"
+                    onclick="this.parentElement.style.display='none';">✖</button>
+            </div>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-            ❌ {{ session('error') }}
+        <div class="max-w-6xl mx-auto mt-4">
+            <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-lg shadow-sm relative"
+                role="alert">
+                <strong class="font-bold">❌ Gagal!</strong>
+                <span class="block sm:inline">{{ session('error') }}</span>
+                <button type="button" class="absolute top-0 bottom-0 right-0 px-4 py-3 text-red-700"
+                    onclick="this.parentElement.style.display='none';">✖</button>
+            </div>
         </div>
     @endif
 
@@ -97,4 +109,11 @@
             ⬅️ Kembali ke Dashboard
         </a>
     </div>
+
+    <!-- ⏱️ Auto-hide alert -->
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('[role="alert"]').forEach(el => el.style.display = 'none');
+        }, 5000);
+    </script>
 </x-app-layout>

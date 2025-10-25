@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
-
+namespace App\Http\Controllers\Admin;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -22,7 +22,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('admin.edit-user', compact('user'));
+        return view('admin.users.edit', compact('user'));
     }
 
     /**

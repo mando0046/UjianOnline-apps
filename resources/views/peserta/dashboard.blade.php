@@ -6,6 +6,7 @@
     </x-slot>
 
     <div class="max-w-4xl mx-auto bg-white p-6 mt-6 rounded-2xl shadow-lg space-y-6">
+
         {{-- === HEADER === --}}
         <div class="text-center">
             <h2 class="text-2xl font-bold text-gray-800">
@@ -14,6 +15,12 @@
             <p class="text-gray-500 mt-1">
                 Kamu dapat memulai ujian, melihat hasil, atau mengajukan reset di sini.
             </p>
+
+            {{-- 🔧 Tombol Profil dengan hover kuning --}}
+            <a href="{{ route('peserta.profil.index') }}"
+                class="inline-block mt-3 px-4 py-2 bg-green-200 rounded-lg text-sm font-semibold text-gray-700 transition hover:bg-yellow-400 hover:text-black hover:font-bold">
+                ⚙️ Edit Profil
+            </a>
         </div>
 
         {{-- === NOTIFIKASI === --}}
@@ -32,6 +39,7 @@
 
         {{-- === MENU AKSI / STATUS INFORMASI === --}}
         <div class="mt-4 flex flex-wrap gap-3 items-center justify-center">
+
             {{-- ✅ Sudah ujian dan belum di-reset --}}
             @if ($hasTakenExam && !$resetApproved)
                 <a href="{{ route('peserta.hasil.index') }}"
@@ -90,7 +98,6 @@
             const startBtn = document.getElementById('startExamBtn');
             const examContainer = document.getElementById('examContainer');
 
-            // Menampilkan ujian ketika tombol diklik
             if (startBtn) {
                 startBtn.addEventListener('click', () => {
                     examContainer.classList.remove('hidden');
@@ -102,12 +109,9 @@
                 });
             }
 
-            // Hilangkan notifikasi otomatis setelah 4 detik
             setTimeout(() => {
-                const success = document.getElementById('alert-success');
-                const error = document.getElementById('alert-error');
-                success?.remove();
-                error?.remove();
+                document.getElementById('alert-success')?.remove();
+                document.getElementById('alert-error')?.remove();
             }, 4000);
         });
     </script>

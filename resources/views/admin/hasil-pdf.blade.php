@@ -60,21 +60,35 @@
                 <th class="px-3 py-2 border">Salah</th>
                 <th class="px-3 py-2 border">Total Soal</th>
                 <th class="px-3 py-2 border">Nilai Akhir</th>
+                <th class="px-3 py-2 border text-center">Waktu Pengerjaan</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($hasilPeserta as $index => $hasil)
-                <tr>
+                <tr class="hover:bg-gray-50 transition">
                     <td class="px-3 py-2 border text-center">{{ $index + 1 }}</td>
-                    <td class="px-3 py-2 border">{{ $hasil['nama'] }}</td>
+                    <td class="px-3 py-2 border">{{ $hasil['nama'] ?? '-' }}</td>
                     <td class="px-3 py-2 border">{{ $hasil['email'] ?? '-' }}</td>
-                    <td class="px-3 py-2 border text-center">{{ $hasil['benar'] }}</td>
+                    <td class="px-3 py-2 border text-center">{{ $hasil['benar'] ?? 0 }}</td>
                     <td class="px-3 py-2 border text-center">
-                        {{ ($hasil['total'] ?? 0) - ($hasil['benar'] ?? 0) }}
+                        {{ max(0, ($hasil['total'] ?? 0) - ($hasil['benar'] ?? 0)) }}
                     </td>
                     <td class="px-3 py-2 border text-center">{{ $hasil['total'] ?? 0 }}</td>
                     <td class="px-3 py-2 border text-center font-semibold text-blue-700">
-                        {{ number_format($hasil['nilai'], 2, ',', '.') }}
+                        {{ number_format($hasil['nilai'] ?? 0, 2, ',', '.') }}
+                    </td>
+                    <td class="px-3 py-2 border text-center text-gray-700">
+                        @php
+                            $tanggal = '-';
+                            if (!empty($hasil['created_at'])) {
+                                try {
+                                    $tanggal = \Carbon\Carbon::parse($hasil['created_at'])->format('d-m-Y H:i');
+                                } catch (\Exception $e) {
+                                    $tanggal = '-';
+                                }
+                            }
+                        @endphp
+                        {{ $tanggal }}
                     </td>
                 </tr>
             @empty
